@@ -1,0 +1,120 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>4Letter</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      color: #111111;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      text-align: center;
+      width: 90%;
+      max-width: 350px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+
+    .username {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 25px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      min-height: 65px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      background: #111;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #777;
+      min-height: 20px;
+    }
+
+    .footer {
+      margin-top: 45px;
+      font-size: 13px;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>4Letter</h1>
+
+    <div class="username" id="username">
+      ----
+    </div>
+
+    <button onclick="generateUsername()">
+      Generate
+    </button>
+
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+      Made By 111
+    </div>
+
+  </div>
+
+  <script>
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+
+    function generateUsername() {
+      let username = "";
+
+      for (let i = 0; i < 4; i++) {
+        username += letters[Math.floor(Math.random() * letters.length)];
+      }
+
+      document.getElementById("username").textContent = username;
+      document.getElementById("status").textContent = "Generated ✓";
+    }
+  </script>
+
+</body>
+</html>
+```
