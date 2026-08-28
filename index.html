@@ -1,77 +1,92 @@
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>4Letter</title>
+  <title>وش نتابع اليوم؟</title>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      color: #111111;
+      margin: 0;
       min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #171717;
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
     .container {
-      text-align: center;
       width: 90%;
-      max-width: 350px;
+      max-width: 430px;
+      text-align: center;
     }
 
     h1 {
-      font-size: 28px;
-      margin-bottom: 25px;
+      font-size: 30px;
+      margin-bottom: 28px;
     }
 
-    .username {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 18px;
-      font-size: 25px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      min-height: 65px;
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px 24px;
+      min-height: 230px;
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      align-items: center;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.06);
+    }
+
+    .emoji {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .series-name {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .genre {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .description {
+      color: #555;
+      font-size: 16px;
+      line-height: 1.8;
     }
 
     button {
       width: 100%;
+      margin-top: 18px;
+      padding: 16px;
       border: none;
-      border-radius: 12px;
-      padding: 15px;
-      background: #111;
+      border-radius: 13px;
+      background: #171717;
       color: white;
       font-size: 17px;
       cursor: pointer;
+      transition: 0.15s;
     }
 
     button:active {
-      transform: scale(0.98);
-    }
-
-    .status {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #777;
-      min-height: 20px;
+      transform: scale(0.97);
     }
 
     .footer {
-      margin-top: 45px;
+      margin-top: 35px;
       font-size: 13px;
       color: #999;
     }
@@ -82,17 +97,29 @@
 
   <div class="container">
 
-    <h1>4Letter</h1>
+    <h1>وش نتابع اليوم؟</h1>
 
-    <div class="username" id="username">
-      ----
+    <div class="card">
+
+      <div class="emoji" id="emoji">🎬</div>
+
+      <div class="series-name" id="seriesName">
+        محتار؟
+      </div>
+
+      <div class="genre" id="genre">
+        خلنا نختار لك
+      </div>
+
+      <div class="description" id="description">
+        اضغط الزر وشوف وش يطلع لك 👀
+      </div>
+
     </div>
 
-    <button onclick="generateUsername()">
-      Generate
+    <button onclick="chooseSeries()">
+      🎲 اختر لي
     </button>
-
-    <div class="status" id="status"></div>
 
     <div class="footer">
       Made By 111
@@ -100,19 +127,468 @@
 
   </div>
 
+
   <script>
-    const letters = "abcdefghijklmnopqrstuvwxyz";
 
-    function generateUsername() {
-      let username = "";
+    const series = [
 
-      for (let i = 0; i < 4; i++) {
-        username += letters[Math.floor(Math.random() * letters.length)];
+      {
+        name: "Breaking Bad",
+        genre: "جريمة • دراما",
+        emoji: "🧪",
+        description: "مدرس كيمياء يدخل عالم الجريمة في محاولة لتغيير حياته."
+      },
+
+      {
+        name: "Better Call Saul",
+        genre: "جريمة • دراما",
+        emoji: "⚖️",
+        description: "محامٍ يحاول بناء مسيرته وسط عالم مليء بالمشاكل والاختيارات الصعبة."
+      },
+
+      {
+        name: "Stranger Things",
+        genre: "خيال علمي • غموض",
+        emoji: "👾",
+        description: "مجموعة أصدقاء يواجهون أحداثًا غريبة وأسرارًا غير متوقعة."
+      },
+
+      {
+        name: "The Office",
+        genre: "كوميديا",
+        emoji: "😂",
+        description: "حياة موظفين في مكتب تتحول إلى سلسلة من المواقف اليومية المضحكة."
+      },
+
+      {
+        name: "Brooklyn Nine-Nine",
+        genre: "كوميديا • شرطة",
+        emoji: "🚔",
+        description: "فريق شرطة غريب الأطوار يعيش مواقف كوميدية داخل القسم."
+      },
+
+      {
+        name: "Friends",
+        genre: "كوميديا • اجتماعي",
+        emoji: "☕",
+        description: "مجموعة أصدقاء يعيشون حياتهم اليومية ومواقفهم الطريفة معًا."
+      },
+
+      {
+        name: "How I Met Your Mother",
+        genre: "كوميديا • رومانسية",
+        emoji: "💛",
+        description: "رجل يحكي لأطفاله قصة السنوات التي قادته إلى التعرف على والدتهم."
+      },
+
+      {
+        name: "The Big Bang Theory",
+        genre: "كوميديا",
+        emoji: "🧠",
+        description: "مجموعة أصدقاء محبين للعلم يعيشون مواقف اجتماعية مضحكة."
+      },
+
+      {
+        name: "Suits",
+        genre: "دراما • قانون",
+        emoji: "👔",
+        description: "شاب بذاكرة استثنائية يدخل عالم المحاماة رغم عدم امتلاكه شهادة قانون."
+      },
+
+      {
+        name: "Sherlock",
+        genre: "غموض • جريمة",
+        emoji: "🔎",
+        description: "محقق عبقري يستخدم ملاحظته وذكاءه لحل أصعب القضايا."
+      },
+
+      {
+        name: "Wednesday",
+        genre: "غموض • كوميديا",
+        emoji: "🖤",
+        description: "طالبة غريبة الأطوار تكتشف أسرارًا غامضة في أكاديمية خاصة."
+      },
+
+      {
+        name: "Dark",
+        genre: "غموض • خيال علمي",
+        emoji: "🕰️",
+        description: "اختفاء غامض يكشف أسرارًا مترابطة بين عدة عائلات."
+      },
+
+      {
+        name: "The Last of Us",
+        genre: "دراما • مغامرة",
+        emoji: "🍄",
+        description: "رحلة مليئة بالمخاطر تجمع شخصين يحاولان النجاة في عالم تغير."
+      },
+
+      {
+        name: "The Mandalorian",
+        genre: "خيال علمي • مغامرة",
+        emoji: "🚀",
+        description: "محارب يتنقل في أنحاء المجرة وتبدأ مهمته بالتحول إلى رحلة مختلفة."
+      },
+
+      {
+        name: "Peaky Blinders",
+        genre: "جريمة • دراما",
+        emoji: "🎩",
+        description: "عائلة قوية تحاول توسيع نفوذها وسط عالم مليء بالصراعات."
+      },
+
+      {
+        name: "The Bear",
+        genre: "دراما • كوميديا",
+        emoji: "🍳",
+        description: "طاهٍ يعود لإدارة مطعم عائلته ويواجه ضغط العمل والعائلة."
+      },
+
+      {
+        name: "House",
+        genre: "طب • دراما",
+        emoji: "🩺",
+        description: "طبيب عبقري يحاول حل الحالات الطبية الأكثر تعقيدًا."
+      },
+
+      {
+        name: "The Good Doctor",
+        genre: "طب • دراما",
+        emoji: "🏥",
+        description: "طبيب شاب يمتلك مهارات استثنائية ويحاول إثبات نفسه في المستشفى."
+      },
+
+      {
+        name: "Prison Break",
+        genre: "أكشن • جريمة",
+        emoji: "🔐",
+        description: "رجل يضع خطة معقدة لمساعدة شخص قريب منه على الهروب من السجن."
+      },
+
+      {
+        name: "Lost",
+        genre: "غموض • مغامرة",
+        emoji: "🏝️",
+        description: "ناجون من حادث يجدون أنفسهم في جزيرة مليئة بالأسرار."
+      },
+
+      {
+        name: "The Walking Dead",
+        genre: "دراما • بقاء",
+        emoji: "🧟",
+        description: "مجموعة من الناجين تحاول الاستمرار في عالم تغير بشكل كبير."
+      },
+
+      {
+        name: "Vikings",
+        genre: "تاريخي • أكشن",
+        emoji: "⚔️",
+        description: "محارب طموح يحلم باستكشاف أراضٍ جديدة وبناء نفوذه."
+      },
+
+      {
+        name: "The Witcher",
+        genre: "فانتازيا • أكشن",
+        emoji: "⚔️",
+        description: "صياد وحوش محترف يتنقل بين عالم مليء بالسحر والمخلوقات الغريبة."
+      },
+
+      {
+        name: "Game of Thrones",
+        genre: "فانتازيا • دراما",
+        emoji: "🐉",
+        description: "عائلات قوية تتنافس على السلطة وسط عالم مليء بالأسرار والصراعات."
+      },
+
+      {
+        name: "House of the Dragon",
+        genre: "فانتازيا • دراما",
+        emoji: "🐲",
+        description: "قصة عائلة ملكية وصراعاتها على السلطة داخل عالم مليء بالتنانين."
+      },
+
+      {
+        name: "The Boys",
+        genre: "أكشن • دراما",
+        emoji: "⚡",
+        description: "مجموعة تحاول مواجهة أصحاب قوى خارقة يستخدمون نفوذهم بطريقة خطيرة."
+      },
+
+      {
+        name: "Invincible",
+        genre: "أنيميشن • أكشن",
+        emoji: "🦸",
+        description: "شاب يكتشف قدراته الخارقة ويحاول فهم مسؤولياته الجديدة."
+      },
+
+      {
+        name: "Arcane",
+        genre: "أنيميشن • فانتازيا",
+        emoji: "✨",
+        description: "شخصيات متنافسة تعيش وسط صراع بين مدينتين مختلفتين."
+      },
+
+      {
+        name: "Cobra Kai",
+        genre: "أكشن • كوميديا",
+        emoji: "🥋",
+        description: "عودة منافسة قديمة في عالم الكاراتيه بعد سنوات طويلة."
+      },
+
+      {
+        name: "The Umbrella Academy",
+        genre: "خيال علمي • أكشن",
+        emoji: "☂️",
+        description: "إخوة يمتلكون قدرات مختلفة يجتمعون لمواجهة أحداث غريبة."
+      },
+
+      {
+        name: "Black Mirror",
+        genre: "خيال علمي • غموض",
+        emoji: "📱",
+        description: "حكايات منفصلة تستكشف تأثير التكنولوجيا على حياة البشر."
+      },
+
+      {
+        name: "Mr. Robot",
+        genre: "دراما • غموض",
+        emoji: "💻",
+        description: "شاب يعمل في الأمن السيبراني يجد نفسه أمام مجموعة من الأسرار."
+      },
+
+      {
+        name: "Dexter",
+        genre: "جريمة • دراما",
+        emoji: "🩸",
+        description: "خبير جنائي يعيش حياة مزدوجة مليئة بالأسرار."
+      },
+
+      {
+        name: "Narcos",
+        genre: "جريمة • دراما",
+        emoji: "💰",
+        description: "دراما تدور حول عالم تجارة المخدرات والصراعات التي تحيط به."
+      },
+
+      {
+        name: "Ozark",
+        genre: "جريمة • دراما",
+        emoji: "💵",
+        description: "عائلة تنتقل إلى منطقة جديدة بعد دخولها في مشكلة مالية خطيرة."
+      },
+
+      {
+        name: "Money Heist",
+        genre: "جريمة • إثارة",
+        emoji: "🎭",
+        description: "مجموعة تنفذ خطة سرية لعملية سرقة ضخمة."
+      },
+
+      {
+        name: "You",
+        genre: "دراما • غموض",
+        emoji: "📖",
+        description: "رجل ينجذب بشدة إلى أشخاص جدد وتبدأ حياته بالدخول في تعقيدات."
+      },
+
+      {
+        name: "Black Sails",
+        genre: "مغامرة • دراما",
+        emoji: "🏴‍☠️",
+        description: "قراصنة يتنافسون على النفوذ والثروة وسط البحار."
+      },
+
+      {
+        name: "The 100",
+        genre: "خيال علمي • مغامرة",
+        emoji: "🌍",
+        description: "مجموعة من الشباب يعودون إلى الأرض لمعرفة ما إذا كانت صالحة للحياة."
+      },
+
+      {
+        name: "Manifest",
+        genre: "غموض • دراما",
+        emoji: "✈️",
+        description: "رحلة جوية تعود بعد سنوات من اختفائها بطريقة غامضة."
+      },
+
+      {
+        name: "Lucifer",
+        genre: "فانتازيا • كوميديا",
+        emoji: "😈",
+        description: "شخصية غامضة تترك عالمها وتبدأ حياة جديدة في مدينة مزدحمة."
+      },
+
+      {
+        name: "The Good Place",
+        genre: "كوميديا • فانتازيا",
+        emoji: "😇",
+        description: "امرأة تجد نفسها في مكان مثالي وتحاول معرفة كيف وصلت إليه."
+      },
+
+      {
+        name: "Community",
+        genre: "كوميديا",
+        emoji: "🎓",
+        description: "مجموعة طلاب مختلفة تمامًا تتعرف على بعضها داخل كلية مجتمعية."
+      },
+
+      {
+        name: "Modern Family",
+        genre: "كوميديا • عائلي",
+        emoji: "🏠",
+        description: "ثلاث عائلات مترابطة تعيش مواقف يومية مضحكة."
+      },
+
+      {
+        name: "Ted Lasso",
+        genre: "كوميديا • رياضة",
+        emoji: "⚽",
+        description: "مدرب أمريكي ينتقل لتدريب فريق كرة قدم في إنجلترا."
+      },
+
+      {
+        name: "The Queen's Gambit",
+        genre: "دراما",
+        emoji: "♟️",
+        description: "فتاة موهوبة في الشطرنج تحاول الوصول إلى أعلى مستويات اللعبة."
+      },
+
+      {
+        name: "The Night Agent",
+        genre: "أكشن • إثارة",
+        emoji: "📞",
+        description: "موظف حكومي يجيب على مكالمة تغير حياته وتدخله في مؤامرة كبيرة."
+      },
+
+      {
+        name: "Reacher",
+        genre: "أكشن • جريمة",
+        emoji: "💪",
+        description: "رجل غامض يمتلك مهارات قوية يجد نفسه وسط قضية خطيرة."
+      },
+
+      {
+        name: "The Recruit",
+        genre: "أكشن • كوميديا",
+        emoji: "🕵️",
+        description: "موظف جديد في وكالة استخبارات يجد نفسه وسط مشاكل أكبر مما توقع."
+      },
+
+      {
+        name: "Wednesday",
+        genre: "غموض • كوميديا",
+        emoji: "🕷️",
+        description: "طالبة غريبة الأطوار تحقق في أسرار وأحداث غير طبيعية."
+      },
+
+      {
+        name: "All of Us Are Dead",
+        genre: "رعب • بقاء",
+        emoji: "🧟",
+        description: "طلاب يجدون أنفسهم محاصرين داخل مدرستهم وسط أزمة مفاجئة."
+      },
+
+      {
+        name: "Alice in Borderland",
+        genre: "غموض • إثارة",
+        emoji: "🃏",
+        description: "ثلاثة أصدقاء يجدون أنفسهم في مدينة غريبة ويضطرون للمشاركة في ألعاب."
+      },
+
+      {
+        name: "Squid Game",
+        genre: "إثارة • غموض",
+        emoji: "🔺",
+        description: "مجموعة أشخاص يدخلون منافسة غامضة بجائزة مالية ضخمة."
+      },
+
+      {
+        name: "One Piece",
+        genre: "مغامرة • فانتازيا",
+        emoji: "🏴‍☠️",
+        description: "قرصان شاب ينطلق في رحلة للعثور على كنز أسطوري."
+      },
+
+      {
+        name: "Attack on Titan",
+        genre: "أنمي • أكشن",
+        emoji: "⚔️",
+        description: "بشر يعيشون خلف أسوار ضخمة لحمايتهم من تهديد غامض."
+      },
+
+      {
+        name: "Demon Slayer",
+        genre: "أنمي • أكشن",
+        emoji: "🔥",
+        description: "شاب يبدأ رحلة صعبة لإنقاذ عائلته ومواجهة مخلوقات خطيرة."
+      },
+
+      {
+        name: "Death Note",
+        genre: "أنمي • غموض",
+        emoji: "📓",
+        description: "طالب يجد دفترًا غامضًا يمتلك قدرة غير عادية ويبدأ باستخدامه."
+      },
+
+      {
+        name: "Jujutsu Kaisen",
+        genre: "أنمي • أكشن",
+        emoji: "👹",
+        description: "شاب يدخل عالمًا مليئًا بالطاقة الغامضة والمخلوقات الخطيرة."
+      },
+
+      {
+        name: "Haikyuu!!",
+        genre: "أنمي • رياضة",
+        emoji: "🏐",
+        description: "لاعب طموح يحاول تطوير نفسه والوصول إلى مستوى عالٍ في الكرة الطائرة."
+      },
+
+      {
+        name: "Spy x Family",
+        genre: "أنمي • كوميديا",
+        emoji: "🕵️",
+        description: "عائلة غير عادية تتكون من أشخاص يخفي كل منهم سرًا مختلفًا."
       }
 
-      document.getElementById("username").textContent = username;
-      document.getElementById("status").textContent = "Generated ✓";
+    ];
+
+
+    let lastIndex = -1;
+
+
+    function chooseSeries() {
+
+      let randomIndex;
+
+      do {
+        randomIndex =
+          Math.floor(Math.random() * series.length);
+      }
+
+      while (
+        randomIndex === lastIndex &&
+        series.length > 1
+      );
+
+      lastIndex = randomIndex;
+
+      const selected = series[randomIndex];
+
+      document.getElementById("emoji").textContent =
+        selected.emoji;
+
+      document.getElementById("seriesName").textContent =
+        selected.name;
+
+      document.getElementById("genre").textContent =
+        selected.genre;
+
+      document.getElementById("description").textContent =
+        selected.description;
     }
+
   </script>
 
 </body>
