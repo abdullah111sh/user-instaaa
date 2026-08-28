@@ -16,8 +16,9 @@
       margin: 0;
       min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
+      background: #f6f6f6;
       color: #171717;
+
       display: flex;
       justify-content: center;
       align-items: center;
@@ -27,38 +28,54 @@
       width: 90%;
       max-width: 430px;
       text-align: center;
+      padding: 25px 0;
     }
 
     h1 {
       font-size: 30px;
-      margin-bottom: 28px;
+      margin: 0 0 25px;
     }
 
     .card {
       background: white;
       border-radius: 20px;
-      padding: 30px 24px;
-      min-height: 230px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      padding: 18px;
       box-shadow: 0 6px 25px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
     }
 
-    .emoji {
-      font-size: 38px;
-      margin-bottom: 10px;
+    .poster {
+      width: 100%;
+      max-height: 430px;
+      object-fit: cover;
+      border-radius: 14px;
+      display: block;
+      background: #eeeeee;
+    }
+
+    .info {
+      padding: 22px 5px 5px;
     }
 
     .series-name {
-      font-size: 26px;
+      font-size: 27px;
       font-weight: bold;
       margin-bottom: 10px;
     }
 
     .genre {
-      color: #888;
+      color: #777;
       font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .details {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: #555;
       margin-bottom: 18px;
     }
 
@@ -72,12 +89,16 @@
       width: 100%;
       margin-top: 18px;
       padding: 16px;
+
       border: none;
       border-radius: 13px;
+
       background: #171717;
       color: white;
+
       font-size: 17px;
       cursor: pointer;
+
       transition: 0.15s;
     }
 
@@ -85,10 +106,22 @@
       transform: scale(0.97);
     }
 
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
     .footer {
-      margin-top: 35px;
-      font-size: 13px;
+      margin-top: 30px;
       color: #999;
+      font-size: 13px;
+    }
+
+    .loading {
+      display: none;
+      color: #888;
+      font-size: 14px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -101,25 +134,50 @@
 
     <div class="card">
 
-      <div class="emoji" id="emoji">🎬</div>
+      <img
+        id="poster"
+        class="poster"
+        src="https://via.placeholder.com/500x750?text=%F0%9F%8E%AC"
+        alt="بوستر المسلسل"
+      >
 
-      <div class="series-name" id="seriesName">
-        محتار؟
-      </div>
+      <div class="info">
 
-      <div class="genre" id="genre">
-        خلنا نختار لك
-      </div>
+        <div class="series-name" id="seriesName">
+          محتار؟
+        </div>
 
-      <div class="description" id="description">
-        اضغط الزر وشوف وش يطلع لك 👀
+        <div class="genre" id="genre">
+          اضغط الزر وخلي الاختيار علينا
+        </div>
+
+        <div class="details">
+
+          <span id="seasons">
+            📺 — مواسم
+          </span>
+
+          <span id="runtime">
+            ⏱️ — دقيقة
+          </span>
+
+        </div>
+
+        <div class="description" id="description">
+          بنختار لك مسلسل عشوائي بدون ما تحتار 👀
+        </div>
+
       </div>
 
     </div>
 
-    <button onclick="chooseSeries()">
+    <button id="chooseButton" onclick="chooseSeries()">
       🎲 اختر لي
     </button>
+
+    <div class="loading" id="loading">
+      لحظة نجيب البوستر... 🎬
+    </div>
 
     <div class="footer">
       Made By 111
@@ -130,426 +188,371 @@
 
   <script>
 
+    /*
+      المسلسلات الموجودة في الموقع
+      بدون أنمي
+    */
+
     const series = [
 
       {
         name: "Breaking Bad",
-        genre: "جريمة • دراما",
-        emoji: "🧪",
-        description: "مدرس كيمياء يدخل عالم الجريمة في محاولة لتغيير حياته."
+        description:
+          "مدرس كيمياء يدخل عالم الجريمة في محاولة لتغيير حياته."
       },
 
       {
         name: "Better Call Saul",
-        genre: "جريمة • دراما",
-        emoji: "⚖️",
-        description: "محامٍ يحاول بناء مسيرته وسط عالم مليء بالمشاكل والاختيارات الصعبة."
+        description:
+          "محامٍ يحاول بناء مسيرته وسط عالم مليء بالمشاكل والاختيارات الصعبة."
       },
 
       {
         name: "Stranger Things",
-        genre: "خيال علمي • غموض",
-        emoji: "👾",
-        description: "مجموعة أصدقاء يواجهون أحداثًا غريبة وأسرارًا غير متوقعة."
+        description:
+          "مجموعة أصدقاء يواجهون أحداثًا غريبة وأسرارًا غير متوقعة."
       },
 
       {
         name: "The Office",
-        genre: "كوميديا",
-        emoji: "😂",
-        description: "حياة موظفين في مكتب تتحول إلى سلسلة من المواقف اليومية المضحكة."
+        description:
+          "حياة موظفين في مكتب تتحول إلى سلسلة من المواقف اليومية المضحكة."
       },
 
       {
         name: "Brooklyn Nine-Nine",
-        genre: "كوميديا • شرطة",
-        emoji: "🚔",
-        description: "فريق شرطة غريب الأطوار يعيش مواقف كوميدية داخل القسم."
+        description:
+          "فريق شرطة غريب الأطوار يعيش مواقف كوميدية داخل القسم."
       },
 
       {
         name: "Friends",
-        genre: "كوميديا • اجتماعي",
-        emoji: "☕",
-        description: "مجموعة أصدقاء يعيشون حياتهم اليومية ومواقفهم الطريفة معًا."
+        description:
+          "مجموعة أصدقاء يعيشون حياتهم اليومية ومواقفهم الطريفة معًا."
       },
 
       {
         name: "How I Met Your Mother",
-        genre: "كوميديا • رومانسية",
-        emoji: "💛",
-        description: "رجل يحكي لأطفاله قصة السنوات التي قادته إلى التعرف على والدتهم."
+        description:
+          "رجل يحكي لأطفاله قصة السنوات التي قادته إلى التعرف على والدتهم."
       },
 
       {
         name: "The Big Bang Theory",
-        genre: "كوميديا",
-        emoji: "🧠",
-        description: "مجموعة أصدقاء محبين للعلم يعيشون مواقف اجتماعية مضحكة."
+        description:
+          "مجموعة أصدقاء محبين للعلم يعيشون مواقف اجتماعية مضحكة."
       },
 
       {
         name: "Suits",
-        genre: "دراما • قانون",
-        emoji: "👔",
-        description: "شاب بذاكرة استثنائية يدخل عالم المحاماة رغم عدم امتلاكه شهادة قانون."
+        description:
+          "شاب بذاكرة استثنائية يدخل عالم المحاماة رغم عدم امتلاكه شهادة قانون."
       },
 
       {
         name: "Sherlock",
-        genre: "غموض • جريمة",
-        emoji: "🔎",
-        description: "محقق عبقري يستخدم ملاحظته وذكاءه لحل أصعب القضايا."
+        description:
+          "محقق عبقري يستخدم ملاحظته وذكاءه لحل القضايا والألغاز."
       },
 
       {
         name: "Wednesday",
-        genre: "غموض • كوميديا",
-        emoji: "🖤",
-        description: "طالبة غريبة الأطوار تكتشف أسرارًا غامضة في أكاديمية خاصة."
+        description:
+          "طالبة غريبة الأطوار تكتشف أسرارًا غامضة في أكاديمية خاصة."
       },
 
       {
         name: "Dark",
-        genre: "غموض • خيال علمي",
-        emoji: "🕰️",
-        description: "اختفاء غامض يكشف أسرارًا مترابطة بين عدة عائلات."
+        description:
+          "اختفاء غامض يكشف أسرارًا مترابطة بين عدة عائلات."
       },
 
       {
         name: "The Last of Us",
-        genre: "دراما • مغامرة",
-        emoji: "🍄",
-        description: "رحلة مليئة بالمخاطر تجمع شخصين يحاولان النجاة في عالم تغير."
+        description:
+          "رحلة مليئة بالمخاطر تجمع شخصين يحاولان النجاة في عالم تغير."
       },
 
       {
         name: "The Mandalorian",
-        genre: "خيال علمي • مغامرة",
-        emoji: "🚀",
-        description: "محارب يتنقل في أنحاء المجرة وتبدأ مهمته بالتحول إلى رحلة مختلفة."
+        description:
+          "محارب يتنقل في أنحاء المجرة وتبدأ مهمته بالتحول إلى رحلة مختلفة."
       },
 
       {
         name: "Peaky Blinders",
-        genre: "جريمة • دراما",
-        emoji: "🎩",
-        description: "عائلة قوية تحاول توسيع نفوذها وسط عالم مليء بالصراعات."
+        description:
+          "عائلة قوية تحاول توسيع نفوذها وسط عالم مليء بالصراعات."
       },
 
       {
         name: "The Bear",
-        genre: "دراما • كوميديا",
-        emoji: "🍳",
-        description: "طاهٍ يعود لإدارة مطعم عائلته ويواجه ضغط العمل والعائلة."
+        description:
+          "طاهٍ يعود لإدارة مطعم عائلته ويواجه ضغط العمل والعائلة."
       },
 
       {
         name: "House",
-        genre: "طب • دراما",
-        emoji: "🩺",
-        description: "طبيب عبقري يحاول حل الحالات الطبية الأكثر تعقيدًا."
+        description:
+          "طبيب عبقري يحاول حل الحالات الطبية الأكثر تعقيدًا."
       },
 
       {
         name: "The Good Doctor",
-        genre: "طب • دراما",
-        emoji: "🏥",
-        description: "طبيب شاب يمتلك مهارات استثنائية ويحاول إثبات نفسه في المستشفى."
+        description:
+          "طبيب شاب يمتلك مهارات استثنائية ويحاول إثبات نفسه في المستشفى."
       },
 
       {
         name: "Prison Break",
-        genre: "أكشن • جريمة",
-        emoji: "🔐",
-        description: "رجل يضع خطة معقدة لمساعدة شخص قريب منه على الهروب من السجن."
+        description:
+          "رجل يضع خطة معقدة لمساعدة شخص قريب منه على الهروب من السجن."
       },
 
       {
         name: "Lost",
-        genre: "غموض • مغامرة",
-        emoji: "🏝️",
-        description: "ناجون من حادث يجدون أنفسهم في جزيرة مليئة بالأسرار."
+        description:
+          "ناجون من حادث يجدون أنفسهم في جزيرة مليئة بالأسرار."
       },
 
       {
         name: "The Walking Dead",
-        genre: "دراما • بقاء",
-        emoji: "🧟",
-        description: "مجموعة من الناجين تحاول الاستمرار في عالم تغير بشكل كبير."
+        description:
+          "مجموعة من الناجين تحاول الاستمرار في عالم تغير بشكل كبير."
       },
 
       {
         name: "Vikings",
-        genre: "تاريخي • أكشن",
-        emoji: "⚔️",
-        description: "محارب طموح يحلم باستكشاف أراضٍ جديدة وبناء نفوذه."
+        description:
+          "محارب طموح يحلم باستكشاف أراضٍ جديدة وبناء نفوذه."
       },
 
       {
         name: "The Witcher",
-        genre: "فانتازيا • أكشن",
-        emoji: "⚔️",
-        description: "صياد وحوش محترف يتنقل بين عالم مليء بالسحر والمخلوقات الغريبة."
+        description:
+          "صياد وحوش محترف يتنقل بين عالم مليء بالسحر والمخلوقات الغريبة."
       },
 
       {
         name: "Game of Thrones",
-        genre: "فانتازيا • دراما",
-        emoji: "🐉",
-        description: "عائلات قوية تتنافس على السلطة وسط عالم مليء بالأسرار والصراعات."
+        description:
+          "عائلات قوية تتنافس على السلطة وسط عالم مليء بالأسرار والصراعات."
       },
 
       {
         name: "House of the Dragon",
-        genre: "فانتازيا • دراما",
-        emoji: "🐲",
-        description: "قصة عائلة ملكية وصراعاتها على السلطة داخل عالم مليء بالتنانين."
+        description:
+          "قصة عائلة ملكية وصراعاتها على السلطة داخل عالم مليء بالتنانين."
       },
 
       {
         name: "The Boys",
-        genre: "أكشن • دراما",
-        emoji: "⚡",
-        description: "مجموعة تحاول مواجهة أصحاب قوى خارقة يستخدمون نفوذهم بطريقة خطيرة."
-      },
-
-      {
-        name: "Invincible",
-        genre: "أنيميشن • أكشن",
-        emoji: "🦸",
-        description: "شاب يكتشف قدراته الخارقة ويحاول فهم مسؤولياته الجديدة."
-      },
-
-      {
-        name: "Arcane",
-        genre: "أنيميشن • فانتازيا",
-        emoji: "✨",
-        description: "شخصيات متنافسة تعيش وسط صراع بين مدينتين مختلفتين."
+        description:
+          "مجموعة تحاول مواجهة أصحاب قوى خارقة يستخدمون نفوذهم بطريقة خطيرة."
       },
 
       {
         name: "Cobra Kai",
-        genre: "أكشن • كوميديا",
-        emoji: "🥋",
-        description: "عودة منافسة قديمة في عالم الكاراتيه بعد سنوات طويلة."
+        description:
+          "عودة منافسة قديمة في عالم الكاراتيه بعد سنوات طويلة."
       },
 
       {
         name: "The Umbrella Academy",
-        genre: "خيال علمي • أكشن",
-        emoji: "☂️",
-        description: "إخوة يمتلكون قدرات مختلفة يجتمعون لمواجهة أحداث غريبة."
+        description:
+          "إخوة يمتلكون قدرات مختلفة يجتمعون لمواجهة أحداث غريبة."
       },
 
       {
         name: "Black Mirror",
-        genre: "خيال علمي • غموض",
-        emoji: "📱",
-        description: "حكايات منفصلة تستكشف تأثير التكنولوجيا على حياة البشر."
+        description:
+          "حكايات منفصلة تستكشف تأثير التكنولوجيا على حياة البشر."
       },
 
       {
         name: "Mr. Robot",
-        genre: "دراما • غموض",
-        emoji: "💻",
-        description: "شاب يعمل في الأمن السيبراني يجد نفسه أمام مجموعة من الأسرار."
+        description:
+          "شاب يعمل في الأمن السيبراني يجد نفسه أمام مجموعة من الأسرار."
       },
 
       {
         name: "Dexter",
-        genre: "جريمة • دراما",
-        emoji: "🩸",
-        description: "خبير جنائي يعيش حياة مزدوجة مليئة بالأسرار."
+        description:
+          "خبير جنائي يعيش حياة مزدوجة مليئة بالأسرار."
       },
 
       {
         name: "Narcos",
-        genre: "جريمة • دراما",
-        emoji: "💰",
-        description: "دراما تدور حول عالم تجارة المخدرات والصراعات التي تحيط به."
+        description:
+          "دراما تدور حول عالم الجريمة والصراعات التي تحيط به."
       },
 
       {
         name: "Ozark",
-        genre: "جريمة • دراما",
-        emoji: "💵",
-        description: "عائلة تنتقل إلى منطقة جديدة بعد دخولها في مشكلة مالية خطيرة."
+        description:
+          "عائلة تنتقل إلى منطقة جديدة بعد دخولها في مشكلة مالية خطيرة."
       },
 
       {
         name: "Money Heist",
-        genre: "جريمة • إثارة",
-        emoji: "🎭",
-        description: "مجموعة تنفذ خطة سرية لعملية سرقة ضخمة."
+        description:
+          "مجموعة تنفذ خطة سرية لعملية سرقة ضخمة."
       },
 
       {
         name: "You",
-        genre: "دراما • غموض",
-        emoji: "📖",
-        description: "رجل ينجذب بشدة إلى أشخاص جدد وتبدأ حياته بالدخول في تعقيدات."
-      },
-
-      {
-        name: "Black Sails",
-        genre: "مغامرة • دراما",
-        emoji: "🏴‍☠️",
-        description: "قراصنة يتنافسون على النفوذ والثروة وسط البحار."
+        description:
+          "رجل غامض يدخل في علاقات معقدة وتبدأ حياته بالتغير."
       },
 
       {
         name: "The 100",
-        genre: "خيال علمي • مغامرة",
-        emoji: "🌍",
-        description: "مجموعة من الشباب يعودون إلى الأرض لمعرفة ما إذا كانت صالحة للحياة."
+        description:
+          "مجموعة من الشباب تعود إلى الأرض لمعرفة ما إذا كانت صالحة للحياة."
       },
 
       {
         name: "Manifest",
-        genre: "غموض • دراما",
-        emoji: "✈️",
-        description: "رحلة جوية تعود بعد سنوات من اختفائها بطريقة غامضة."
+        description:
+          "رحلة جوية تعود بعد سنوات من اختفائها بطريقة غامضة."
       },
 
       {
         name: "Lucifer",
-        genre: "فانتازيا • كوميديا",
-        emoji: "😈",
-        description: "شخصية غامضة تترك عالمها وتبدأ حياة جديدة في مدينة مزدحمة."
+        description:
+          "شخصية غامضة تبدأ حياة جديدة وتجد نفسها وسط قضايا غير عادية."
       },
 
       {
         name: "The Good Place",
-        genre: "كوميديا • فانتازيا",
-        emoji: "😇",
-        description: "امرأة تجد نفسها في مكان مثالي وتحاول معرفة كيف وصلت إليه."
+        description:
+          "امرأة تجد نفسها في مكان مثالي وتحاول معرفة كيف وصلت إليه."
       },
 
       {
         name: "Community",
-        genre: "كوميديا",
-        emoji: "🎓",
-        description: "مجموعة طلاب مختلفة تمامًا تتعرف على بعضها داخل كلية مجتمعية."
+        description:
+          "مجموعة طلاب مختلفة تتعرف على بعضها داخل كلية مجتمعية."
       },
 
       {
         name: "Modern Family",
-        genre: "كوميديا • عائلي",
-        emoji: "🏠",
-        description: "ثلاث عائلات مترابطة تعيش مواقف يومية مضحكة."
+        description:
+          "ثلاث عائلات مترابطة تعيش مواقف يومية مضحكة."
       },
 
       {
         name: "Ted Lasso",
-        genre: "كوميديا • رياضة",
-        emoji: "⚽",
-        description: "مدرب أمريكي ينتقل لتدريب فريق كرة قدم في إنجلترا."
+        description:
+          "مدرب ينتقل لتدريب فريق كرة قدم ويواجه عالمًا جديدًا تمامًا."
       },
 
       {
         name: "The Queen's Gambit",
-        genre: "دراما",
-        emoji: "♟️",
-        description: "فتاة موهوبة في الشطرنج تحاول الوصول إلى أعلى مستويات اللعبة."
+        description:
+          "فتاة موهوبة في الشطرنج تحاول الوصول إلى أعلى مستويات اللعبة."
       },
 
       {
         name: "The Night Agent",
-        genre: "أكشن • إثارة",
-        emoji: "📞",
-        description: "موظف حكومي يجيب على مكالمة تغير حياته وتدخله في مؤامرة كبيرة."
+        description:
+          "موظف حكومي يجيب على مكالمة تدخله في مؤامرة كبيرة."
       },
 
       {
         name: "Reacher",
-        genre: "أكشن • جريمة",
-        emoji: "💪",
-        description: "رجل غامض يمتلك مهارات قوية يجد نفسه وسط قضية خطيرة."
+        description:
+          "رجل غامض يمتلك مهارات قوية يجد نفسه وسط قضية خطيرة."
       },
 
       {
         name: "The Recruit",
-        genre: "أكشن • كوميديا",
-        emoji: "🕵️",
-        description: "موظف جديد في وكالة استخبارات يجد نفسه وسط مشاكل أكبر مما توقع."
-      },
-
-      {
-        name: "Wednesday",
-        genre: "غموض • كوميديا",
-        emoji: "🕷️",
-        description: "طالبة غريبة الأطوار تحقق في أسرار وأحداث غير طبيعية."
+        description:
+          "موظف جديد في وكالة استخبارات يجد نفسه وسط مشاكل أكبر مما توقع."
       },
 
       {
         name: "All of Us Are Dead",
-        genre: "رعب • بقاء",
-        emoji: "🧟",
-        description: "طلاب يجدون أنفسهم محاصرين داخل مدرستهم وسط أزمة مفاجئة."
+        description:
+          "طلاب يجدون أنفسهم محاصرين داخل مدرستهم وسط أزمة مفاجئة."
       },
 
       {
         name: "Alice in Borderland",
-        genre: "غموض • إثارة",
-        emoji: "🃏",
-        description: "ثلاثة أصدقاء يجدون أنفسهم في مدينة غريبة ويضطرون للمشاركة في ألعاب."
+        description:
+          "ثلاثة أصدقاء يجدون أنفسهم في مدينة غريبة ويواجهون اختبارات مختلفة."
       },
 
       {
         name: "Squid Game",
-        genre: "إثارة • غموض",
-        emoji: "🔺",
-        description: "مجموعة أشخاص يدخلون منافسة غامضة بجائزة مالية ضخمة."
+        description:
+          "مجموعة أشخاص يدخلون منافسة غامضة بجائزة مالية ضخمة."
       },
 
       {
-        name: "One Piece",
-        genre: "مغامرة • فانتازيا",
-        emoji: "🏴‍☠️",
-        description: "قرصان شاب ينطلق في رحلة للعثور على كنز أسطوري."
+        name: "Euphoria",
+        description:
+          "دراما شبابية تتابع مجموعة من الشخصيات وتجاربهم وعلاقاتهم."
       },
 
       {
-        name: "Attack on Titan",
-        genre: "أنمي • أكشن",
-        emoji: "⚔️",
-        description: "بشر يعيشون خلف أسوار ضخمة لحمايتهم من تهديد غامض."
+        name: "The Vampire Diaries",
+        description:
+          "حياة مجموعة من الشباب تتغير بعد وصول شخصيات غامضة إلى مدينتهم."
       },
 
       {
-        name: "Demon Slayer",
-        genre: "أنمي • أكشن",
-        emoji: "🔥",
-        description: "شاب يبدأ رحلة صعبة لإنقاذ عائلته ومواجهة مخلوقات خطيرة."
+        name: "Supernatural",
+        description:
+          "شقيقان يسافران معًا ويواجهان أحداثًا ومخلوقات خارقة."
       },
 
       {
-        name: "Death Note",
-        genre: "أنمي • غموض",
-        emoji: "📓",
-        description: "طالب يجد دفترًا غامضًا يمتلك قدرة غير عادية ويبدأ باستخدامه."
+        name: "The Flash",
+        description:
+          "شاب يحصل على قدرة خارقة ويحاول استخدامها لحماية مدينته."
       },
 
       {
-        name: "Jujutsu Kaisen",
-        genre: "أنمي • أكشن",
-        emoji: "👹",
-        description: "شاب يدخل عالمًا مليئًا بالطاقة الغامضة والمخلوقات الخطيرة."
+        name: "Arrow",
+        description:
+          "رجل يعود إلى مدينته ويقرر محاربة الجريمة بطريقة مختلفة."
       },
 
       {
-        name: "Haikyuu!!",
-        genre: "أنمي • رياضة",
-        emoji: "🏐",
-        description: "لاعب طموح يحاول تطوير نفسه والوصول إلى مستوى عالٍ في الكرة الطائرة."
+        name: "The Rookie",
+        description:
+          "رجل يبدأ مسيرته كشرطي في وقت متأخر ويحاول إثبات نفسه."
       },
 
       {
-        name: "Spy x Family",
-        genre: "أنمي • كوميديا",
-        emoji: "🕵️",
-        description: "عائلة غير عادية تتكون من أشخاص يخفي كل منهم سرًا مختلفًا."
+        name: "Only Murders in the Building",
+        description:
+          "ثلاثة جيران يجمعهم حب الجرائم الغامضة ويبدأون تحقيقهم الخاص."
+      },
+
+      {
+        name: "The White Lotus",
+        description:
+          "ضيوف في منتجع فاخر يعيشون عطلة تتكشف خلالها أسرار كثيرة."
+      },
+
+      {
+        name: "Severance",
+        description:
+          "موظفون يعيشون فصلًا غريبًا بين حياتهم في العمل وحياتهم خارجه."
+      },
+
+      {
+        name: "The Last Kingdom",
+        description:
+          "محارب يعيش وسط صراعات تاريخية ويحاول استعادة مكانه وهويته."
+      },
+
+      {
+        name: "Boardwalk Empire",
+        description:
+          "رجل ذو نفوذ يدير عالمًا مليئًا بالسياسة والجريمة في حقبة تاريخية."
       }
 
     ];
@@ -558,35 +561,141 @@
     let lastIndex = -1;
 
 
-    function chooseSeries() {
+    async function chooseSeries() {
+
+      const button =
+        document.getElementById("chooseButton");
+
+      const loading =
+        document.getElementById("loading");
+
+      button.disabled = true;
+      loading.style.display = "block";
+
 
       let randomIndex;
 
       do {
         randomIndex =
           Math.floor(Math.random() * series.length);
-      }
 
-      while (
+      } while (
         randomIndex === lastIndex &&
         series.length > 1
       );
+
 
       lastIndex = randomIndex;
 
       const selected = series[randomIndex];
 
-      document.getElementById("emoji").textContent =
-        selected.emoji;
 
-      document.getElementById("seriesName").textContent =
-        selected.name;
+      /*
+        البحث عن بيانات المسلسل
+        من TVmaze
+      */
 
-      document.getElementById("genre").textContent =
-        selected.genre;
+      try {
 
-      document.getElementById("description").textContent =
-        selected.description;
+        const response = await fetch(
+          "https://api.tvmaze.com/singlesearch/shows?show=" +
+          encodeURIComponent(selected.name)
+        );
+
+        if (!response.ok) {
+          throw new Error("لم يتم العثور على المسلسل");
+        }
+
+        const data = await response.json();
+
+
+        document.getElementById("seriesName").textContent =
+          selected.name;
+
+
+        document.getElementById("description").textContent =
+          selected.description;
+
+
+        document.getElementById("genre").textContent =
+          data.genres && data.genres.length
+            ? data.genres.join(" • ")
+            : "مسلسل";
+
+
+        document.getElementById("seasons").textContent =
+          "📺 " +
+          (data._embedded &&
+           data._embedded.episodes
+            ? countSeasons(data._embedded.episodes)
+            : "—") +
+          " مواسم";
+
+
+        document.getElementById("runtime").textContent =
+          "⏱️ " +
+          (data.averageRuntime || data.runtime || "—") +
+          " دقيقة";
+
+
+        if (data.image && data.image.original) {
+
+          document.getElementById("poster").src =
+            data.image.original;
+
+        } else {
+
+          document.getElementById("poster").src =
+            "https://via.placeholder.com/500x750?text=No+Poster";
+        }
+
+      } catch (error) {
+
+        /*
+          إذا ما حصلنا البيانات،
+          نعرض الاسم والوصف على الأقل
+        */
+
+        document.getElementById("seriesName").textContent =
+          selected.name;
+
+        document.getElementById("genre").textContent =
+          "مسلسل";
+
+        document.getElementById("seasons").textContent =
+          "📺 — مواسم";
+
+        document.getElementById("runtime").textContent =
+          "⏱️ — دقيقة";
+
+        document.getElementById("description").textContent =
+          selected.description;
+
+      }
+
+
+      loading.style.display = "none";
+      button.disabled = false;
+    }
+
+
+    /*
+      حساب عدد المواسم من الحلقات
+    */
+
+    function countSeasons(episodes) {
+
+      const seasons = new Set();
+
+      episodes.forEach(function(episode) {
+
+        if (episode.season) {
+          seasons.add(episode.season);
+        }
+
+      });
+
+      return seasons.size || "—";
     }
 
   </script>
